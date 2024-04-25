@@ -37,6 +37,18 @@ const UserSchema = new mongoose.Schema({
     minlength: 6,
     maxlength: 20,
   },
+  lastName: {
+    type: String,
+    trim: true,
+    maxlength: 20,
+    default: "lastName",
+  },
+  location: {
+    type: String,
+    trim: true,
+    maxlength: 20,
+    default: "my city",
+  },
 });
 
 // MONGOOSE MIDDLEWARE (BEFORE SAVING THE DOCUMENT!)
