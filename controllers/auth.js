@@ -66,24 +66,28 @@ const login = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { email, lastName, name, location } = req.body;
+  console.log(email);
   if (!email || !name || !lastName || !location) {
     throw new BadRequest("Please provide all values");
   }
-
-  /*const userEmail = await User.findOneAndUpdate(
+  const user = await User.findOneAndUpdate(
     { email: req.user.email },
     { email, lastName, name, location }
-  );*/
+  );
 
-  const user = await User.findOne({ _id: req.user.userId });
+  /*const user = await User.findOne({ _id: req.user._id });
+  console.log("aqui");
+  console.log(user);
 
   user.email = email;
+  console.log("aqui2");
   user.name = name;
   user.lastName = lastName;
   user.location = location;
+  console.log("aqui3");
 
   await user.save();
-
+  console.log("aqui3");*/
   const token = user.generateToken();
   return res.status(StatusCodes.OK).json({
     user: {
