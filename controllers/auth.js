@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, location, lastName } = req.body;
   /* if (!name) {
     throw new BadRequest("You need to provide a name");
   }
@@ -24,7 +24,15 @@ const register = async (req, res) => {
   const new_user = await User.create({ ...req.body });
   // NOW IT'S ALL VALIDATED!
   const token = new_user.generateToken();
-  return res.status(StatusCodes.CREATED).json({ user: { name }, token });
+  return res.status(StatusCodes.CREATED).json({
+    user: {
+      email,
+      lastName,
+      location,
+      name,
+      token,
+    },
+  });
 };
 
 const login = async (req, res) => {
@@ -45,9 +53,15 @@ const login = async (req, res) => {
     throw new UnauthenticatedError("Invalid Credentials!");
   }
   const token = userEmail.generateToken();
-  return res
-    .status(StatusCodes.OK)
-    .json({ user: { name: userEmail.name }, token });
+  return res.status(StatusCodes.OK).json({
+    user: {
+      email,
+      lastName: userEmail.lastName,
+      location: userEmail.location,
+      name: userEmail.name,
+      token,
+    },
+  });
 };
 
 module.exports = { login, register };
