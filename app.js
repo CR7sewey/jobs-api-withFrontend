@@ -20,6 +20,9 @@ const routerJobs = require("./routes/jobs");
 
 const app = express();
 
+const path = require("path");
+app.use(express.static(path.resolve(__dirname, "./client/build")));
+
 app.use(express.json());
 app.use(helmet());
 app.use(xss());
@@ -29,6 +32,11 @@ app.use(xss());
 // routes
 app.use("/api/v1/auth/", routerAuth);
 app.use("/api/v1/jobs/", tokenVerification, routerJobs);
+
+app.get("*", (req, res) => {
+  // index from frontend (react app) - home page
+  res.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
+});
 
 // MIDWARES
 app.use(notFoundMiddleware);
