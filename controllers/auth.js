@@ -64,4 +64,36 @@ const login = async (req, res) => {
   });
 };
 
-module.exports = { login, register };
+const updateUser = async (req, res) => {
+  const { email, lastName, name, location } = req.body;
+  if (!email || !name || !lastName || !location) {
+    throw new BadRequest("Please provide all values");
+  }
+
+  /*const userEmail = await User.findOneAndUpdate(
+    { email: req.user.email },
+    { email, lastName, name, location }
+  );*/
+
+  const user = await User.findOne({ _id: req.user.userId });
+
+  user.email = email;
+  user.name = name;
+  user.lastName = lastName;
+  user.location = location;
+
+  await user.save();
+
+  const token = user.generateToken();
+  return res.status(StatusCodes.OK).json({
+    user: {
+      email,
+      lastName,
+      location,
+      name,
+      token,
+    },
+  });
+};
+
+module.exports = { login, register, updateUser };
