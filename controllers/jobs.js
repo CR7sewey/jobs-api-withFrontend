@@ -27,6 +27,7 @@ const getAllJobs = async (req, res) => {
   console.log(sortType[sort]);
   let jobs = Job.find({ ...queryObj }).sort(sortType[sort]);
 
+  // in the request for seeing the second page of pagination the page is 2 and so on!
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10;
   const skip = (page - 1) * limit;

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const testUserMiddleware = require("../middleware/test-user");
 const {
   getJob,
   getAllJobs,
@@ -10,8 +11,8 @@ const {
 
 router.get("/", getAllJobs);
 router.get("/:id", getJob);
-router.post("/", createJob);
-router.patch("/:id", updateJob);
-router.delete("/:id", deleteJob);
+router.post("/", testUserMiddleware, createJob);
+router.patch("/:id", testUserMiddleware, updateJob);
+router.delete("/:id", testUserMiddleware, deleteJob);
 
 module.exports = router;

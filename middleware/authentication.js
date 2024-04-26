@@ -22,6 +22,11 @@ const tokenVerification = async (req, res, next) => {
       );
     }
     //req.user = { userID, userName, userEmail };
+
+    if (userID === "662aa75db14ded6c68a8e1ca") {
+      // testUser
+      req.testUser = user;
+    }
     req.user = user;
     next();
   } catch (e) {
