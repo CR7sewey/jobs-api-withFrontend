@@ -4,10 +4,10 @@ const NotFound = require("../errors/not-found-error");
 const BadRequestError = require("../errors/bad-request-error");
 
 const getAllJobs = async (req, res) => {
-  const all_jobs = await Job.find({ createdBy: req.user._id }).sort({
+  const jobs = await Job.find({ createdBy: req.user._id }).sort({
     createdBy: -1,
   });
-  return res.status(StatusCodes.OK).json({ all_jobs });
+  return res.status(StatusCodes.OK).json({ jobs, count: jobs.length });
 };
 
 const getJob = async (req, res) => {
@@ -26,9 +26,9 @@ const createJob = async (req, res) => {
   if (!id) {
     throw new Error("Well not supposed to be here!");
   }
-  const new_job = await Job.create({ ...req.body, createdBy: id });
+  const job = await Job.create({ ...req.body, createdBy: id });
 
-  return res.status(StatusCodes.CREATED).json({ new_job });
+  return res.status(StatusCodes.CREATED).json({ job });
 };
 
 const updateJob = async (req, res) => {
