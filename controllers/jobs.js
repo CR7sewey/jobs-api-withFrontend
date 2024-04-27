@@ -121,11 +121,16 @@ const statsJobs = async (req, res) => {
     { $group: { _id: "$status", count: { $sum: 1 } } },
   ]);
   console.log(data);
+  /*stats = stats.reduce((acc, curr) => {
+    const { _id: title, count } = curr;
+    acc[title] = count;
+    return acc;
+  }, {});*/
   let defaultStats = {};
   data.map((value) => {
-    defaultStats[value._id] = value.count;
+    defaultStats[value._id] = value.count || 0;
   });
-
+  console.log("data", data);
   // MONTHLY APPLICATIONS
   // last six months,
   const data2 = await Job.aggregate([
