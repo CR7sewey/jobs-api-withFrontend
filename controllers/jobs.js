@@ -2,6 +2,7 @@ const Job = require("../models/Job");
 const { StatusCodes } = require("http-status-codes");
 const NotFound = require("../errors/not-found-error");
 const BadRequestError = require("../errors/bad-request-error");
+const mongoose = require("mongoose");
 
 const getAllJobs = async (req, res) => {
   // search, status, type, sort filters on the frontend - queries
@@ -96,11 +97,21 @@ const deleteJob = async (req, res) => {
 
 //https://www.mongodb.com/docs/manual/core/aggregation-pipeline/
 const statsJobs = async (req, res) => {
-  console.log("aqui");
-
-  return res
-    .status(StatusCodes.OK)
-    .json({ defaultStats: {}, monthlyApplications: [] });
+  // as it stands, we query the db to give us an array [{_id: declined, count: x}, ...]
+  const data = await Job.aggregate([
+    //mongoose.Types.ObjectId
+    { $match: { createdBy: req.user._id } },
+    { $group: { _id: "$status", count: { $sum: 1 } } },
+  ]);
+  console.log(data);
+  let defaultStats = {};
+  data.map((value) => {
+    defaultStats[value._id] = value.count;
+  });
+  return res.status(StatusCodes.OK).json({
+    defaultStats,
+    monthlyApplications: [data],
+  });
 };
 
 module.exports = {
