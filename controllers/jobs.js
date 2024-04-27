@@ -2,7 +2,22 @@ const Job = require("../models/Job");
 const { StatusCodes } = require("http-status-codes");
 const NotFound = require("../errors/not-found-error");
 const BadRequestError = require("../errors/bad-request-error");
-const mongoose = require("mongoose");
+const moment = require("moment");
+
+const months = {
+  12: "Dec",
+  11: "Nov",
+  10: "Out",
+  9: "Set",
+  8: "Aug",
+  7: "Jul",
+  6: "Jun",
+  5: "May",
+  4: "Apr",
+  3: "Mar",
+  2: "Feb",
+  1: "Jan",
+};
 
 const getAllJobs = async (req, res) => {
   // search, status, type, sort filters on the frontend - queries
@@ -96,7 +111,9 @@ const deleteJob = async (req, res) => {
 };
 
 //https://www.mongodb.com/docs/manual/core/aggregation-pipeline/
+//https://mongoosejs.com/docs/api/aggregate.html
 const statsJobs = async (req, res) => {
+  // DEFAULT STATS
   // as it stands, we query the db to give us an array [{_id: declined, count: x}, ...]
   const data = await Job.aggregate([
     //mongoose.Types.ObjectId
@@ -108,9 +125,52 @@ const statsJobs = async (req, res) => {
   data.map((value) => {
     defaultStats[value._id] = value.count;
   });
+
+  // MONTHLY APPLICATIONS
+  // last six months,
+  const data2 = await Job.aggregate([
+    { $match: { createdBy: req.user._id } },
+    {
+      $group: {
+        _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { "_id.year": -1, "_id.month": -1 }, // sort by year and mtonh desc
+    },
+    {
+      $limit: 6, // last 6 months
+    },
+  ]);
+  console.log(data2);
+  /*let monthlyApplications = data2.map((value) => {
+    let temporaryObj = {};
+    temporaryObj.date = `${value._id.year} - ${months[value._id.month]}`;
+    temporaryObj.count = value.count;
+    return temporaryObj;
+  });
+  monthlyApplications = monthlyApplications.reverse();
+  console.log(monthlyApplications);
+
   return res.status(StatusCodes.OK).json({
     defaultStats,
-    monthlyApplications: [data],
+    monthlyApplications,
+  });*/
+
+  let monthlyApplications = data2.map((value) => {
+    //temporaryObj[`${value._id.year} - ${months[value._id.month]}`] = value.count;
+    date = moment()
+      .month(value._id.month - 1)
+      .year(value._id.year)
+      .format("MMM Y");
+    return { date, count: value.count };
+  });
+  monthlyApplications = monthlyApplications.reverse();
+  console.log(monthlyApplications);
+  return res.status(StatusCodes.OK).json({
+    defaultStats,
+    monthlyApplications,
   });
 };
 
