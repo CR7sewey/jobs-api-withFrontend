@@ -94,4 +94,20 @@ const deleteJob = async (req, res) => {
   return res.status(StatusCodes.OK).json({ job });
 };
 
-module.exports = { getJob, getAllJobs, createJob, updateJob, deleteJob };
+//https://www.mongodb.com/docs/manual/core/aggregation-pipeline/
+const statsJobs = async (req, res) => {
+  console.log("aqui");
+
+  return res
+    .status(StatusCodes.OK)
+    .json({ defaultStats: {}, monthlyApplications: [] });
+};
+
+module.exports = {
+  getJob,
+  getAllJobs,
+  createJob,
+  updateJob,
+  deleteJob,
+  statsJobs,
+};
